@@ -6,7 +6,8 @@ import asyncio
 import os
 from importlib import import_module
 from transformers import StoppingCriteria
-
+import sys
+sys.path.append("/opt/tiger/open-instruct")
 from open_instruct.finetune import encode_with_prompt_completion_format
 from eval.dispatch_openai_requests import dispatch_openai_chat_requesets, dispatch_openai_prompt_requesets
 

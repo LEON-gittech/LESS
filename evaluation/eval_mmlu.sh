@@ -3,9 +3,9 @@ source eval.sh
 # main evaluation function
 eval_mmlu() {
     mdir=$1
-    set_save_dir $mdir mmlu
+    set_save_dir $mdir mmlu shit
     mkdir -p $save_dir
-    cmd="python -m eval.mmlu.run_eval \
+    cmd="python3 -m eval.mmlu.run_eval \
     --ntrain 5 \
     --data_dir $DATA_DIR/mmlu \
     --save_dir $save_dir \
@@ -22,7 +22,7 @@ valid_mmlu() {
     type=$2
     set_valid_dir $mdir mmlu
     mkdir -p $save_dir
-    cmd="python -m eval.mmlu.run_eval \
+    cmd="python3 -m eval.mmlu.run_eval \
     --ntrain 5 \
     --eval_valid \
     --data_dir $DATA_DIR/mmlu \

@@ -5,7 +5,7 @@ eval_truthfulqa() {
     mdir=$1
     set_save_dir $mdir truthfulqa
     mkdir -p $save_dir
-    cmd="python -m eval.truthfulqa.run_eval \
+    cmd="python3 -m eval.truthfulqa.run_eval \
     --data_dir $DATA_DIR/truthfulqa/ \
     --save_dir $save_dir \
     --model $mdir \

@@ -42,7 +42,7 @@ def main(args):
     print("Loading data...")
 
     test_data = []
-    with open(os.path.join(args.data_dir, "tydiqa-goldp-v1.1-dev.json")) as fin:
+    with open(os.path.join(args.data_dir, "test/tydiqa-goldp-v1.1-dev.json")) as fin:
         dev_data = json.load(fin)
         for article in dev_data["data"]:
             for paragraph in article["paragraphs"]:
@@ -72,9 +72,11 @@ def main(args):
 
     if args.n_shot > 0:
         train_data_for_langs = {lang: [] for lang in data_languages}
-        with open(os.path.join(args.data_dir, "tydiqa-goldp-v1.1-train.json")) as fin:
+        # with open(os.path.join(args.data_dir, "dev/tydiqa-goldp-v1.1-train.json")) as fin:
+        with open(os.path.join(args.data_dir, "dev/tydiqa-goldp-v1.1-dev.json")) as fin:
             train_data = json.load(fin)
             for article in train_data["data"]:
+            # for article in train_data:
                 for paragraph in article["paragraphs"]:
                     for qa in paragraph["qas"]:
                         lang = qa["id"].split("-")[0]

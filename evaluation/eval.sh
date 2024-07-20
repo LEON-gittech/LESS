@@ -3,7 +3,7 @@ set_save_dir() {
     if [[ -d $mdir ]]; then
         save_dir=${mdir}/eval/$2
     else
-        save_dir=$n/space10/out/$(basename $mdir)/eval/$2
+        save_dir=$n/out/$(basename $mdir)/eval/$2
     fi
 }
 
@@ -12,11 +12,11 @@ set_valid_dir() {
     if [[ -d $mdir ]]; then
         save_dir=${mdir}/valid/$2
     else
-        save_dir=$n/space10/out/$(basename $mdir)/valid/$2
+        save_dir=$n/out/$(basename $mdir)/valid/$2
     fi
 }
 
-export DATA_DIR=$n/space10/data/eval
+export DATA_DIR=$n/less-data/eval
 export set_save_dir
 export set_valid_dir
 

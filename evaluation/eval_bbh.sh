@@ -5,7 +5,7 @@ eval_bbh() {
     mdir=$1
     set_save_dir $mdir bbh
     mkdir -p $save_dir
-    cmd="python -m eval.bbh.run_eval \
+    cmd="python3 -m eval.bbh.run_eval \
     --data_dir $DATA_DIR/bbh \
     --save_dir $save_dir \
     --model $mdir \
@@ -22,7 +22,7 @@ valid_bbh() {
     set_valid_dir $mdir bbh
     echo $save_dir
     mkdir -p $save_dir
-    cmd="python -m eval.bbh.run_eval \
+    cmd="python3 -m eval.bbh.run_eval \
     --data_dir $DATA_DIR/bbh-valid \
     --save_dir $save_dir \
     --model $mdir \

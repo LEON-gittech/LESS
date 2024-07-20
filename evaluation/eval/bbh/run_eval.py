@@ -50,7 +50,7 @@ def main(args):
     random.seed(42)
 
     all_tasks = {}
-    task_files = glob.glob(os.path.join(args.data_dir, "bbh", "*.json"))
+    task_files = glob.glob(os.path.join(args.data_dir, "test","*.json"))
     for task_file in tqdm.tqdm(task_files, desc="Loading tasks"):
         with open(task_file, "r") as f:
             task_name = os.path.basename(task_file).split(".")[0]
@@ -83,6 +83,8 @@ def main(args):
             all_prompts[task_name] = task_prompt
 
     if not args.eval_valid:
+        # print(all_tasks.keys())
+        # print(all_prompts.keys())
         assert set(all_tasks.keys()) == set(all_prompts.keys(
         )), "task names in task data and task prompts are not the same."
 

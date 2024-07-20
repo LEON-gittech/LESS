@@ -5,7 +5,7 @@ eval_tydiqa() {
     mdir=$1
     set_save_dir $mdir tydiqa
     mkdir -p $save_dir
-    cmd="python -m eval.tydiqa.run_eval \
+    cmd="python3 -m eval.tydiqa.run_eval \
     --data_dir $DATA_DIR/tydiqa/ \
     --n_shot 1 \
     --max_num_examples_per_lang 200 \
@@ -25,7 +25,7 @@ valid_tydiqa() {
     mdir=$1
     set_valid_dir $mdir tydiqa
     mkdir -p $save_dir
-    cmd="python -m eval.tydiqa.run_eval \
+    cmd="python3 -m eval.tydiqa.run_eval \
     --data_dir $DATA_DIR/tydiqa/one-shot-valid \
     --n_shot 0 \
     --eval_valid \
