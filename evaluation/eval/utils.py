@@ -200,7 +200,8 @@ def load_hf_lm_and_tokenizer(
     
     from transformers import AutoModelForCausalLM, AutoTokenizer, OPTForCausalLM, GPTNeoXForCausalLM
     
-    is_peft = "lora" in model_name_or_path 
+    is_peft = "lora" in model_name_or_path or "adapter_config.json" in os.listdir(model_name_or_path)
+    print(is_peft)
     from peft import PeftConfig, PeftModel
     
     if is_peft:

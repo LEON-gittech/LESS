@@ -65,7 +65,7 @@ def main():
     set_seed(training_args.seed)
 
     tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
-    # Load training dataset
+    # Load training dataset, 得到 encoded data
     train_dataset = get_training_dataset(data_args.train_files,
                                          tokenizer=tokenizer,
                                          max_seq_length=data_args.max_seq_length,
