@@ -12,7 +12,8 @@ eval_mmlu() {
     --model_name_or_path $mdir \
     --tokenizer_name_or_path $mdir \
     --eval_batch_size 4 \
-    --convert_to_bf16"
+    --convert_to_bf16 \
+    --subjects anatomy clinical_knowledge college_biology college_medicine medical_genetics professional_medicine"
     eval "$cmd" 2>&1 | tee $save_dir/log.txt
 }
 

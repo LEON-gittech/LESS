@@ -178,6 +178,7 @@ def main(args):
     )
 
     if args.subjects:
+        print(args.subjects)
         assert all(
             subj in subjects for subj in args.subjects), f"Some of the subjects you specified are not valid: {args.subjects}"
         subjects = args.subjects
