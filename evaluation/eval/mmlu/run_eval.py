@@ -153,21 +153,25 @@ def eval_openai_chat_engine(args, subject, engine, dev_df, test_df, batch_size=1
     print("Average accuracy {:.3f} - {}".format(acc, subject))
     return cors, acc, all_probs
 
-
+from unsloth import FastLanguageModel 
 def main(args):
 
     if args.model_name_or_path:
         print("Loading model and tokenizer...")
-        model, tokenizer = load_hf_lm_and_tokenizer(
-            model_name_or_path=args.model_name_or_path,
-            tokenizer_name_or_path=args.tokenizer_name_or_path,
-            load_in_8bit=args.load_in_8bit,
-            device_map="balanced_low_0" if torch.cuda.device_count() > 1 else "auto",
-            gptq_model=args.gptq,
-            use_fast_tokenizer=not args.use_slow_tokenizer,
-            convert_to_bf16=args.convert_to_bf16,
-            convert_to_half=args.convert_to_half,
-        )
+        # model, tokenizer = load_hf_lm_and_tokenizer(
+        #     model_name_or_path=args.model_name_or_path,
+        #     tokenizer_name_or_path=args.tokenizer_name_or_path,
+        #     load_in_8bit=args.load_in_8bit,
+        #     device_map="balanced_low_0" if torch.cuda.device_count() > 1 else "auto",
+        #     gptq_model=args.gptq,
+        #     use_fast_tokenizer=not args.use_slow_tokenizer,
+        #     convert_to_bf16=args.convert_to_bf16,
+        #     convert_to_half=args.convert_to_half,
+        # )
+        print(args.model_name_or_path)
+        model, tokenizer = FastLanguageModel.from_pretrained(args.model_name_or_path, dtype = torch.bfloat16, load_in_4bit=True)
+        FastLanguageModel.for_inference(model)
+        model.generation_config.pad_token_id = tokenizer.eos_token_id
 
     subjects = sorted(
         [
