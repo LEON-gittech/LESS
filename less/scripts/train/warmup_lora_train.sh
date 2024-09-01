@@ -13,10 +13,11 @@ if [[ ! -d $output_dir ]]; then
     mkdir -p $output_dir
 fi
 
-train_files=("$data_dir/train/processed/flan_v2/flan_v2_data.jsonl"
-    "$data_dir/train/processed/cot/cot_data.jsonl"
-    "$data_dir/train/processed/dolly/dolly_data.jsonl"
-"$data_dir/train/processed/oasst1/oasst1_data.jsonl")
+# train_files=("$data_dir/train/processed/flan_v2/flan_v2_data.jsonl"
+#     "$data_dir/train/processed/cot/cot_data.jsonl"
+#     "$data_dir/train/processed/dolly/dolly_data.jsonl"
+# "$data_dir/train/processed/oasst1/oasst1_data.jsonl")
+train_files="/mnt/bn/data-tns-live-llm/leon/less/prompt_code.parquet"
 
 # use fsdp for large models
 if [[ $model_path == "meta-llama/Llama-2-13b-hf" ]]; then

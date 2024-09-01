@@ -17,10 +17,10 @@ from less.data_selection.collect_grad_reps import (collect_grads, collect_reps,
 from less.data_selection.get_training_dataset import get_training_dataset
 from less.data_selection.get_validation_dataset import (get_dataloader,
                                                         get_dataset)
-
+# from unsloth import FastLanguageModel
 
 def load_model(model_name_or_path: str,
-               torch_dtype: Any = torch.bfloat16) -> Any:
+               torch_dtype: Any = torch.bfloat16, unsloth: int = 1) -> Any:
     """
     Load a model from a given model name or path.
 
@@ -31,24 +31,32 @@ def load_model(model_name_or_path: str,
     Returns:
         Any: The loaded model.
     """
-
-    is_peft = os.path.exists(os.path.join(
-        model_name_or_path, "adapter_config.json"))
-    if is_peft:
-        # load this way to make sure that optimizer states match the model structure
-        config = LoraConfig.from_pretrained(model_name_or_path)
-        base_model = AutoModelForCausalLM.from_pretrained(
-            config.base_model_name_or_path, torch_dtype=torch_dtype, device_map="auto")
-        model = PeftModel.from_pretrained(
-            base_model, model_name_or_path, device_map="auto")
+    model: PeftModel
+    if unsloth:
+        pass
+        # model, tokenizer = FastLanguageModel.from_pretrained(model_name_or_path, dtype=torch_dtype)
     else:
-        model = AutoModelForCausalLM.from_pretrained(
-            model_name_or_path, torch_dtype=torch_dtype, device_map="auto")
+        is_peft = os.path.exists(os.path.join(
+            model_name_or_path, "adapter_config.json"))
+        if is_peft:
+            # load this way to make sure that optimizer states match the model structure
+            config = LoraConfig.from_pretrained(model_name_or_path)
+            base_model = AutoModelForCausalLM.from_pretrained(
+                config.base_model_name_or_path, torch_dtype=torch_dtype, device_map="auto")
+            tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+            base_model.resize_token_embeddings(len(tokenizer))
+            model = PeftModel.from_pretrained(
+                base_model, model_name_or_path, device_map="auto")
+        else:
+            model = AutoModelForCausalLM.from_pretrained(
+                model_name_or_path, torch_dtype=torch_dtype, device_map="auto")
 
     for name, param in model.named_parameters():
         if 'lora' in name or 'Lora' in name:
             param.requires_grad = True
-    return model
+    
+    # model.eval()
+    return model, tokenizer
 
 
 parser = argparse.ArgumentParser(
@@ -91,13 +99,13 @@ parser.add_argument("--lora_dropout", type=float, default=0.1,
                     help="The value of lora_dropout hyperparameter")
 parser.add_argument("--lora_target_modules", nargs='+', default=[
                     "q_proj", "k_proj", "v_proj", "o_proj"],  help="The list of lora_target_modules")
+parser.add_argument("--unsloth", type=int, default=1)
 
 args = parser.parse_args()
 assert args.task is not None or args.train_file is not None
 
-tokenizer = AutoTokenizer.from_pretrained(args.model_path)
 dtype = torch.float16 if args.torch_dtype == "float16" else torch.bfloat16
-model = load_model(args.model_path, dtype)
+model, tokenizer = load_model(args.model_path, dtype, args.unsloth)
 
 # pad token is not added by default for pretrained models
 if tokenizer.pad_token is None:
@@ -125,9 +133,14 @@ if isinstance(model, PeftModel):
 
 adam_optimizer_state = None
 if args.info_type == "grads" and args.gradient_type == "adam":
-    optimizer_path = os.path.join(args.model_path, "optimizer.bin")
-    adam_optimizer_state = torch.load(
-        optimizer_path, map_location="cpu")["state"]
+    try:
+        optimizer_path = os.path.join(args.model_path, "optimizer.bin")
+        adam_optimizer_state = torch.load(
+            optimizer_path, map_location="cpu")["state"]
+    except:
+        optimizer_path = os.path.join(args.model_path, "optimizer.pt")
+        adam_optimizer_state = torch.load(
+            optimizer_path, map_location="cpu", weights_only=True)["state"]
 
 if args.task is not None:
     dataset = get_dataset(args.task,
@@ -153,6 +166,7 @@ if args.info_type == "reps":
     collect_reps(dataloader, model, args.output_path,
                  max_samples=args.max_samples)
 elif args.info_type == "grads":
+    print(args.max_samples)
     collect_grads(dataloader,
                   model,
                   args.output_path,

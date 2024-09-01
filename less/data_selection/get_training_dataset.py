@@ -4,7 +4,7 @@ from typing import List, Union
 
 import numpy as np
 import torch
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
 
 
 @contextlib.contextmanager
@@ -32,10 +32,17 @@ def load_raw_dataset(train_files: Union[List[str], str], sample_size=None, sampl
     """ load raw dataset """
     if isinstance(train_files, str):
         train_files = [train_files]
-    processed_datasets = load_dataset(
-        "json",
-        data_files=train_files,
-    )["train"]
+    
+    if "json" in train_files[0]:
+        processed_datasets = load_dataset(
+            "json",
+            data_files=train_files,
+        )["train"]
+    elif "parquet" in train_files[0]:
+        processed_datasets = load_from_disk(train_files[0])
+    else:
+        processed_datasets = load_dataset(train_files,)["train"]
+        
     if sample_size is None:
         sample_size = int(len(processed_datasets) * sample_percentage)
 

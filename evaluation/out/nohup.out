@@ -1,0 +1,53 @@
+Traceback (most recent call last):
+  File "/home/tiger/miniconda3/envs/gsm/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/tiger/miniconda3/envs/gsm/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/mnt/bn/data-tns-live-llm/leon/LESS/evaluation/eval/gsm/run_eval.py", line 8, in <module>
+    import evaluate
+ModuleNotFoundError: No module named 'evaluate'
+[2024-08-15 13:00:48,980] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.3
+[93m [WARNING] [0m using untested triton version (2.3.0), only 1.0.0 is known to be compatible
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+Loading data...
+Loading model and tokenizer...
+==((====))==  Unsloth 2024.8: Fast Llama patching. Transformers = 4.44.0.dev0.
+   \\   /|    GPU: NVIDIA H100 80GB HBM3. Max memory: 79.109 GB. Platform = Linux.
+O^O/ \_/ \    Pytorch: 2.3.0+cu121. CUDA = 9.0. CUDA Toolkit = 12.1.
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.26.post1. FA2 = False]
+ "-____-"     Free Apache license: http://github.com/unslothai/unsloth
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:   0%|          | 0/4 [00:14<?, ?it/s]
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/mnt/bn/data-tns-live-llm/leon/LESS/evaluation/eval/gsm/run_eval.py", line 266, in <module>
+    main(args)
+  File "/mnt/bn/data-tns-live-llm/leon/LESS/evaluation/eval/gsm/run_eval.py", line 118, in main
+    model, tokenizer = FastLanguageModel.from_pretrained(args.model_name_or_path, dtype = torch.bfloat16, load_in_4bit=True)
+  File "/home/tiger/.local/lib/python3.9/site-packages/unsloth/models/loader.py", line 255, in from_pretrained
+    model, tokenizer = dispatch_model.from_pretrained(
+  File "/home/tiger/.local/lib/python3.9/site-packages/unsloth/models/llama.py", line 1370, in from_pretrained
+    model = AutoModelForCausalLM.from_pretrained(
+  File "/home/tiger/.local/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/tiger/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 3938, in from_pretrained
+    ) = cls._load_pretrained_model(
+  File "/home/tiger/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 4412, in _load_pretrained_model
+    new_error_msgs, offload_index, state_dict_index = _load_state_dict_into_meta_model(
+  File "/home/tiger/.local/lib/python3.9/site-packages/transformers/modeling_utils.py", line 940, in _load_state_dict_into_meta_model
+    hf_quantizer.create_quantized_param(model, param, param_name, param_device, state_dict, unexpected_keys)
+  File "/home/tiger/.local/lib/python3.9/site-packages/transformers/quantizers/quantizer_bnb_4bit.py", line 223, in create_quantized_param
+    new_value = bnb.nn.Params4bit(new_value, requires_grad=False, **kwargs).to(target_device)
+  File "/home/tiger/.local/lib/python3.9/site-packages/bitsandbytes/nn/modules.py", line 327, in to
+    return self._quantize(device)
+  File "/home/tiger/.local/lib/python3.9/site-packages/bitsandbytes/nn/modules.py", line 292, in _quantize
+    w_4bit, quant_state = bnb.functional.quantize_4bit(
+  File "/home/tiger/.local/lib/python3.9/site-packages/bitsandbytes/functional.py", line 1241, in quantize_4bit
+    code = get_4bit_type(quant_type, device=A.device)
+  File "/home/tiger/.local/lib/python3.9/site-packages/bitsandbytes/functional.py", line 1094, in get_4bit_type
+    data = torch.tensor(data, device=device)
+KeyboardInterrupt

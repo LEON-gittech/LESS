@@ -14,6 +14,10 @@ from eval.utils import (
 )
 from eval.gsm.examplars import EXAMPLARS as GSM_EXAMPLARS
 from unsloth import FastLanguageModel 
+# import ray
+
+# ray.shutdown()
+# ray.init(num_gpus=torch.cuda.device_count())
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 exact_match = evaluate.load("exact_match")
 
@@ -83,8 +87,11 @@ def main(args):
         #         model=args.model_name_or_path,
         #         tokenizer=args.tokenizer_name_or_path if args.tokenizer_name_or_path else args.model_name_or_path,
         #         tokenizer_mode="slow" if args.use_slow_tokenizer else "auto",
-        #         tensor_parallel_size=torch.cuda.device_count(),
-        #         max_num_batched_tokens=4096,
+        #         tensor_parallel_size=1,
+        #         max_num_batched_tokens=1024,
+        #         max_model_len=1024,
+        #         dtype=torch.bfloat16
+        #         # max_num_batched_tokens=8192,
         #     )
         #     sampling_params = vllm.SamplingParams(
         #         temperature=0,
@@ -98,27 +105,32 @@ def main(args):
         #     }
         #     outputs = [prompt_to_output[prompt] if prompt in prompt_to_output else "" for prompt in prompts]
         # else:
-            
-        # model, tokenizer = load_hf_lm_and_tokenizer(
-        #     model_name_or_path=args.model_name_or_path, 
-        #     tokenizer_name_or_path=args.tokenizer_name_or_path, 
-        #     load_in_8bit=args.load_in_8bit, 
-        #     device_map="balanced_low_0" if torch.cuda.device_count() > 1 else "auto",
-        #     gptq_model=args.gptq,
-        #     use_fast_tokenizer=not args.use_slow_tokenizer,
-        # )
-        model_max_length = 2048
+        #     model, tokenizer = load_hf_lm_and_tokenizer(
+        #         model_name_or_path=args.model_name_or_path, 
+        #         tokenizer_name_or_path=args.tokenizer_name_or_path, 
+        #         load_in_8bit=args.load_in_8bit, 
+        #         device_map="balanced_low_0" if torch.cuda.device_count() > 1 else "auto",
+        #         gptq_model=args.gptq,
+        #         use_fast_tokenizer=not args.use_slow_tokenizer,
+        #         torch_dtype=torch.bfloat16
+        #     )
+        
         model, tokenizer = FastLanguageModel.from_pretrained(args.model_name_or_path, dtype = torch.bfloat16, load_in_4bit=True)
         FastLanguageModel.for_inference(model)
         model.generation_config.pad_token_id = tokenizer.eos_token_id
+        
+        model_max_length = 2048
         new_line_token = tokenizer.encode("\n", add_special_tokens=False)[-1] # get the last token because the tokenizer may add space tokens at the start.
+        print("newline_token", new_line_token)
+        question_token = tokenizer.encode("Question", add_special_tokens=False)[-1]
+        print("question_token", question_token)
         outputs = generate_completions(
             model=model,
             tokenizer=tokenizer,
             prompts=prompts,
             max_new_tokens=model_max_length,
             batch_size=args.eval_batch_size,
-            stop_id_sequences=[[new_line_token]],
+            stop_id_sequences=[[new_line_token],[question_token]],
             do_sample=False,
         )
     else:

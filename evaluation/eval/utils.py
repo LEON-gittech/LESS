@@ -5,7 +5,7 @@ import time
 import asyncio
 import os
 from importlib import import_module
-from transformers import StoppingCriteria
+from transformers import StoppingCriteria, GenerationMixin
 import sys
 sys.path.append("/mnt/bn/data-tns-live-llm/leon/open-instruct")
 from open_instruct.finetune import encode_with_prompt_completion_format
@@ -50,11 +50,13 @@ def generate_completions(model, tokenizer, prompts, batch_size=1, stop_id_sequen
                 input_ids=batch_input_ids,
                 attention_mask=attention_mask,
                 stopping_criteria=[KeyWordsCriteria(stop_id_sequences)] if stop_id_sequences else None,
-                **generation_kwargs
+                **generation_kwargs,
+                repetition_penalty=1.1,
             )
         
             # the stopping criteria is applied at batch level, so if other examples are not stopped, the entire batch will continue to generate.
             # so some outputs still have the stop sequence, which we need to remove.
+            batch_outputs = batch_outputs.clone()
             if stop_id_sequences:
                 for output_idx in range(batch_outputs.shape[0]):
                     for token_idx in range(batch_input_ids.shape[1], batch_outputs.shape[1]):

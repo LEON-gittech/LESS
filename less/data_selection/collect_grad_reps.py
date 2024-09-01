@@ -6,12 +6,13 @@ from typing import Iterable, List, Optional
 import torch
 import torch.nn.functional as F
 from functorch import grad, make_functional_with_buffers, vmap
-from peft import PeftModel
+from peft import PeftModel, PeftModelForCausalLM
+from peft.tuners.lora.model import LoraModel
 from torch import Tensor
 from torch.nn.functional import normalize
 from tqdm import tqdm
 from trak.projectors import BasicProjector, CudaProjector, ProjectionType
-from transformers import RobertaModel
+from transformers import RobertaModel, LlamaForCausalLM
 
 
 def prepare_batch(batch, device=torch.device("cuda:0")):
@@ -63,6 +64,7 @@ def get_trak_projector(device: torch.device):
         num_sms = torch.cuda.get_device_properties(
             device.index).multi_processor_count
         import fast_jl
+        print(f"num_sms {num_sms}")
 
         # test run to catch at init time if projection goes through
         fast_jl.project_rademacher_8(torch.zeros(
@@ -87,7 +89,7 @@ def get_number_of_params(model):
     return num_params
 
 
-def obtain_gradients(model, batch):
+def obtain_gradients(model: PeftModel, batch):
     """ obtain gradients. """
     loss = model(**batch).loss
     loss.backward()
@@ -96,7 +98,7 @@ def obtain_gradients(model, batch):
     return vectorized_grads
 
 
-def obtain_sign_gradients(model, batch):
+def obtain_sign_gradients(model: PeftModelForCausalLM, batch):
     """ obtain gradients with sign. """
     loss = model(**batch).loss
     loss.backward()
@@ -108,12 +110,15 @@ def obtain_sign_gradients(model, batch):
     return vectorized_grad_signs
 
 
-def obtain_gradients_with_adam(model, batch, avg, avg_sq):
+def obtain_gradients_with_adam(model: PeftModel, batch, avg, avg_sq):
     """ obtain gradients with adam optimizer states. """
     beta1 = 0.9
     beta2 = 0.999
     eps = 1e-08
 
+    # print(batch["input_ids"].shape)
+    # print(type(model.base_model.model))
+    # batch = batch.to("cuda")
     loss = model(**batch).loss
     loss.backward()
 
@@ -129,9 +134,13 @@ def obtain_gradients_with_adam(model, batch, avg, avg_sq):
 
 def prepare_optimizer_state(model, optimizer_state, device):
     names = [n for n, p in model.named_parameters() if p.requires_grad]
-    avg = torch.cat([optimizer_state[n]["exp_avg"].view(-1) for n in names])
-    avg_sq = torch.cat([optimizer_state[n]["exp_avg_sq"].view(-1)
-                       for n in names])
+    try:
+        avg = torch.cat([optimizer_state[n]["exp_avg"].view(-1) for n in names])
+        avg_sq = torch.cat([optimizer_state[n]["exp_avg_sq"].view(-1)
+                        for n in names])
+    except:
+        avg = torch.cat([optimizer_state[i]["exp_avg"].view(-1) for i in range(len(names))])
+        avg_sq = torch.cat([optimizer_state[i]["exp_avg_sq"].view(-1) for i in range(len(names))])
     avg = avg.to(device)
     avg_sq = avg_sq.to(device)
     return avg, avg_sq
@@ -193,6 +202,7 @@ def collect_grads(dataloader,
         assert adam_optimizer_state is not None
         # first and second moment estimates
         m, v = prepare_optimizer_state(model, adam_optimizer_state, device)
+        print(f"m {m} v {v}")
 
     projector = get_trak_projector(device)
     number_of_params = get_number_of_params(model)
@@ -236,7 +246,7 @@ def collect_grads(dataloader,
         count += 1
 
         if count <= max_index:
-            print("skipping count", count)
+            # print("skipping count", count)
             continue
 
         if gradient_type == "adam":

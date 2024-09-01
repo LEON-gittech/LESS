@@ -10,7 +10,7 @@ export n=/mnt/bn/data-tns-live-llm/leon/datasets/
 # result=$(extract_mmlu $mdir)
 # echo "Evaluation result: $result"
 
-mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/public_10_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0
+mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/iid2niid_med_5000_projector_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0
 eval_mmlu $mdir
 result=$(extract_mmlu $mdir)
 echo "Evaluation result: $result"
@@ -27,10 +27,20 @@ echo "Evaluation result: $result"
 # result=$(extract_gsm8k $mdir)
 # echo "Evaluation result: $result"
 
-mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/public_1_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0
-eval_mmlu $mdir
-result=$(extract_mmlu $mdir)
-echo "Evaluation result: $result"
+# mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/iid2niid_med_20000_fedprox_c10s2_i10_b16a2_l2048_r32a64_f0
+# eval_mmlu $mdir
+# result=$(extract_mmlu $mdir)
+# echo "Evaluation result: $result"
+
+# mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/iid2niid_med_20000_scaffold_c10s2_i10_b16a2_l2048_r32a64_f0
+# eval_mmlu $mdir
+# result=$(extract_mmlu $mdir)
+# echo "Evaluation result: $result"
+
+# mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/iid2niid_med_1000_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0/
+# eval_mmlu $mdir
+# result=$(extract_mmlu $mdir)
+# echo "Evaluation result: $result"
 
 # eval_tydiqa $mdir
 # result=$(extract_tydiqa $mdir)
@@ -44,10 +54,10 @@ echo "Evaluation result: $result"
 # result=$(extract_gsm8k $mdir)
 # echo "Evaluation result: $result"
 
-mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/public_0.1_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0
-eval_mmlu $mdir
-result=$(extract_mmlu $mdir)
-echo "Evaluation result: $result"
+# mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/public_0.1_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0
+# eval_mmlu $mdir
+# result=$(extract_mmlu $mdir)
+# echo "Evaluation result: $result"
 
 # eval_tydiqa $mdir
 # result=$(extract_tydiqa $mdir)
@@ -61,10 +71,10 @@ echo "Evaluation result: $result"
 # result=$(extract_gsm8k $mdir)
 # echo "Evaluation result: $result"
 
-mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/public_0.01_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0
-eval_mmlu $mdir
-result=$(extract_mmlu $mdir)
-echo "Evaluation result: $result"
+# mdir=/mnt/bn/data-tns-live-llm/leon/datasets/fed/public_0.01_20000_fedavg_c10s2_i10_b16a2_l2048_r32a64_f0
+# eval_mmlu $mdir
+# result=$(extract_mmlu $mdir)
+# echo "Evaluation result: $result"
 
 # eval_gsm8k $mdir
 # result=$(extract_gsm8k $mdir)
